@@ -1,0 +1,23 @@
+#pragma once
+
+#ifdef OLED_DRIVER_ENABLE
+  #define OLED_DISPLAY_128X64
+#endif
+
+#ifdef RGBLIGHT_ENABLE
+  #define RGBLIGHT_HUE_STEP 8
+  #define RGBLIGHT_SAT_STEP 8
+  #define RGBLIGHT_VAL_STEP 8
+#endif
+
+#ifdef COMBO_ENABLE
+  #define COMBO_COUNT 1
+  #define COMBO_TERM 120
+#endif
+
+#define LEADER_TIMEOUT 500
+#define MASTER_RIGHT
+#define TAPPING_TERM 100
+#define TAPPING_TERM_PER_KEY
+#define IGNORE_MOD_TAP_INTERRUPT
+#define ONESHOT_TIMEOUT 3000
