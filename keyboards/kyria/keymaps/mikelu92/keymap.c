@@ -1,8 +1,6 @@
 #include QMK_KEYBOARD_H
 #include "mikelu.h"
 
-// test
-
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_DVORAK] = LAYOUT(
       KC_TAB,  KC_QUOT, KC_COMM, KC_DOT,  KC_P,    KC_Y,                                         KC_F,    KC_G,    KC_C,    KC_R,    KC_L,    KC_SLSH,
