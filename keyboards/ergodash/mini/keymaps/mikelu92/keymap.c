@@ -3,10 +3,10 @@
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_DVORAK] = LAYOUT( \
-     KC_TAB,  KC_QUOT, KC_COMM, KC_DOT,  KC_P,    KC_Y,   KC_HOME,                        KC_PGUP, KC_F,    KC_G,    KC_C,    KC_R,    KC_L,    KC_SLSH, \
-     KC_BSPC, KC_A,    ALT_HL,  GUI_HL,  CTL_HL,  KC_I,   KC_END,                         KC_PGDN, KC_D,    CTL_HR,  GUI_HR,  ALT_HR, KC_S,    KC_MINS,  \
+     KC_GRV,  KC_QUOT, KC_COMM, KC_DOT,  KC_P,    KC_Y,   KC_HOME,                        KC_PGUP, KC_F,    KC_G,    KC_C,    KC_R,    KC_L,    KC_SLSH, \
+     KC_BSPC, KC_A,    ALT_HL,  GUI_HL,  CTL_HL,  KC_I,   KC_END,                         KC_PGDN, KC_D,    CTL_HR,  GUI_HR,  ALT_HR, KC_S,     KC_MINS, \
      KC_HYPR, KC_SCLN, KC_Q,    KC_J,    KC_K,    KC_X,   KC_ESC,                         SFT_ENT, KC_B,    KC_M,    KC_W,    KC_V,    KC_Z,    KC_EQL,  \
-     TAP_RSE, TAP_SFT, KC_LEAD, KC_ESC,           OSLOW,  KC_SPC,  KC_TAB,       SFT_ENT, SFT_ENT, RAISE,            KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT  \
+     TAP_RSE, TAP_SFT, CMBSRT,  CMBSRT,           OSLOW,  KC_SPC,  KC_TAB,       SFT_ENT, SFT_ENT, RAISE,            KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT  \
   ),
 
   [_QWERTY] = LAYOUT( \

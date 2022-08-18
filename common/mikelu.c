@@ -1,19 +1,50 @@
 #include QMK_KEYBOARD_H
 #include "mikelu.h"
+#include "custom_shift_keys.h"
 #include <stdio.h>
+#ifdef STENO_ENABLE
+#include "keymap_steno.h"
+
+void eeconfig_init_user() {
+    steno_set_mode(STENO_MODE_GEMINI);
+}
+#endif
+
 
 
 user_config_t user_config;
 
+#ifdef KEY_OVERRIDE_ENABLE
+const key_override_t esc_override = ko_make_basic(MOD_MASK_GUI, KC_ESC, G(KC_GRAVE));
+const key_override_t dqt_override = ko_make_basic(MOD_MASK_SHIFT, KC_GRV, KC_DQT);
+
+// This globally defines all key overrides to be used
+const key_override_t **key_overrides = (const key_override_t *[]){
+    &esc_override,
+    &dqt_override,
+    NULL // Null terminate the array of overrides!
+};
+#endif
+
 const uint16_t PROGMEM arrows_combo[] = {KC_Q, KC_J, KC_K, COMBO_END};
+const uint16_t PROGMEM bspc_combo[] = {KC_A, KC_COMM, COMBO_END};
+const uint16_t PROGMEM slsh_combo[] = {KC_R, KC_L, COMBO_END};
+const uint16_t PROGMEM mins_combo[] = {KC_R, KC_S, COMBO_END};
+const uint16_t PROGMEM eql_combo[] = {ALT_HR, KC_Z, COMBO_END};
+const uint16_t PROGMEM ceql_combo[] = {ALT_HR2, TABD_N, COMBO_END};
 
 combo_t key_combos[COMBO_COUNT] = {
     [OEU_ARROWS] = COMBO_ACTION(arrows_combo),
+    [ACOM_BSPC]  = COMBO(bspc_combo, KC_BSPC),
+    [RL_SLSH]    = COMBO(slsh_combo, KC_SLSH),
+    [RS_MINS]    = COMBO(mins_combo, KC_MINS),
+    [NZ_EQL]     = COMBO(eql_combo, KC_EQL),
+    [RP_CEQL]    = COMBO(ceql_combo, COL_EQL),
 };
 
 void process_combo_event(uint16_t combo_index, bool pressed) {
     switch (combo_index) {
-        case OEU_ARROWS:;
+        case OEU_ARROWS:
             //enum layers l = _ARROWS;
             if (pressed) {
                 layer_on(_ARROWS);
@@ -23,6 +54,24 @@ void process_combo_event(uint16_t combo_index, bool pressed) {
             break;
     }
 }
+
+// see this link for more info on this:
+// https://getreuer.info/posts/keyboards/custom-shift-keys/index.html
+const custom_shift_key_t custom_shift_keys[] = {
+  {KC_EXLM, KC_1}, 
+  {ALT_HL2, KC_2},
+  {GUI_HL2, KC_3},
+  {CTL_HL2, KC_4},
+  {KC_PERC, KC_5},
+  {KC_CIRC, KC_6},
+  {CTL_HR2, KC_7},
+  {GUI_HR2, KC_8},
+  {ALT_HR2, KC_9},
+  {KC_RPRN, KC_0},
+};
+
+uint8_t NUM_CUSTOM_SHIFT_KEYS =
+    sizeof(custom_shift_keys) / sizeof(custom_shift_key_t);
 
 
 void keyboard_post_init_user(void) {
@@ -50,14 +99,16 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
         case SFT_ENT:
             return TAPPING_TERM + 20;
         default:
-            return TAPPING_TERM;
+            return TAPPING_TERM+100;
     }
 }
 
 layer_state_t layer_state_set_user(layer_state_t state) { return update_tri_layer_state(state, _LOWER, _RAISE, _ADJUST); }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
+  if (!process_custom_shift_keys(keycode, record)) { return false; }
+
+  switch (keycode) {
         // differences based on os'
         case AUTOFIL:
             if (record->event.pressed) {
@@ -194,115 +245,106 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             break;
         case CTL_HR:
             if (record->event.pressed && record->tap.count > 0) {
-                if (get_mods() & MOD_BIT(KC_RGUI)) {
-                    unregister_mods(MOD_BIT(KC_RGUI));
-                    tap_code(KC_T);
-                    tap_code(KC_H);
-                    add_mods(MOD_BIT(KC_RGUI));
+                if (!mod_tap_override(KC_RGUI, KC_T, KC_H)) {
                     return false;
-                    break;
                 }
             }
             return true;
             break;
         case GUI_HR:
             if (record->event.pressed && record->tap.count > 0) {
-                if (get_mods() & MOD_BIT(KC_RALT)) {
-                    unregister_mods(MOD_BIT(KC_RALT));
-                    tap_code(KC_N);
-                    tap_code(KC_T);
-                    add_mods(MOD_BIT(KC_RALT));
+                if (!mod_tap_override(KC_RALT, KC_N, KC_T)) {
                     return false;
-                    break;
                 }
             }
             return true;
         case KC_G:
             if (record->event.pressed) {
-                if (get_mods() & MOD_BIT(KC_RALT)) {
-                    unregister_mods(MOD_BIT(KC_RALT));
-                    tap_code(KC_N);
-                    tap_code(KC_G);
-                    add_mods(MOD_BIT(KC_RALT));
+                if (!mod_tap_override(KC_RALT, KC_N, KC_G)) {
                     return false;
-                    break;
                 }
             }
             return true;
         case KC_F:
             if (record->event.pressed) {
-                if (get_mods() & MOD_BIT(KC_LALT)) {
-                    unregister_mods(MOD_BIT(KC_LALT));
-                    tap_code(KC_O);
-                    tap_code(KC_F);
-                    add_mods(MOD_BIT(KC_LALT));
+                if (!mod_tap_override(KC_LALT, KC_O, KC_F)) {
                     return false;
-                    break;
+                }
+            }
+            return true;
+        case KC_R:
+            if (record->event.pressed) {
+                if (!mod_tap_override(KC_LGUI, KC_E, KC_R)) {
+                    return false;
+                }
+            }
+        return true;
+        case KC_A:
+            if (record->event.pressed) {
+                if (!mod_tap_override(KC_RCTL, KC_H, KC_A)) {
+                    return false;
+                }
+                if (!mod_tap_override(KC_LCTL, KC_U, KC_A)) {
+                    return false;
                 }
             }
             return true;
     case ALT_HL2:
-        if (record->tap.count > 0) {
-          if (record->event.pressed) {
-            tap_code16(KC_AT);
-          }
-          return false;
-        }
-        return true;
+        return num_mod(record, KC_AT);
     case GUI_HL2:
-        if (record->tap.count > 0) {
-          if (record->event.pressed) {
-            tap_code16(KC_HASH);
-          }
-          return false;
-        }
-        return true;
+        return num_mod(record, KC_HASH);
     case CTL_HL2:
-        if (record->tap.count > 0) {
-          if (record->event.pressed) {
-            tap_code16(KC_DLR);
-          }
-          return false;
-        }
-        return true;
+        return num_mod(record, KC_DLR);
     case ALT_HR2:
-        if (record->tap.count > 0) {
-          if (record->event.pressed) {
-            tap_code16(KC_LPRN);
-          }
-          return false;
-        }
-        return true;
+        return num_mod(record, KC_LPRN);
     case GUI_HR2:
-        if (record->tap.count > 0) {
-          if (record->event.pressed) {
-            tap_code16(KC_ASTR);
-          }
-          return false;
-        }
-        return true;
+        return num_mod(record, KC_ASTR);
     case CTL_HR2:
-        if (record->tap.count > 0) {
-          if (record->event.pressed) {
-            tap_code16(KC_AMPR);
-          }
-          return false;
-        }
-        return true;
+        return num_mod(record, KC_AMPR);
+#ifdef STENO_ENABLE
+    case PLOVER:
+      if (record->event.pressed) {
+        layer_off(_RAISE);
+        layer_off(_LOWER);
+        layer_off(_ADJUST);
+        layer_on(_PLOVER);
+      }
+      return false;
+      break;
+    case EXT_PLV:
+      if (record->event.pressed) {
+        layer_off(_PLOVER);
+      }
+      return false;
+      break;
+#endif
     }
     return true;
 }
 
-void matrix_scan_user(void) { leader_func(); }
-
-#ifdef OLED_DRIVER_ENABLE
-oled_rotation_t oled_init_user(oled_rotation_t rotation) { return OLED_ROTATION_180; }
-
-static void render_leader_macros(void) {
-    oled_write_P(PSTR("Macro Sequence\n\n"), true);
-    oled_write_P(PSTR("ts: tmux window panes"), false);
-    oled_write_P(PSTR("ut: update vm time\n"), false);
+bool num_mod(keyrecord_t *record, uint16_t key) {
+    if (record->tap.count > 0) {
+        if (record->event.pressed) {
+            tap_code16(key);
+        }
+        return false;
+    }
+    return true;
 }
+
+bool mod_tap_override(uint16_t mod, uint16_t key1, uint16_t key2) {
+    if (get_mods() & MOD_BIT(mod)) {
+        unregister_mods(MOD_BIT(mod));
+        tap_code(key1);
+        tap_code(key2);
+        add_mods(MOD_BIT(mod));
+        return false;
+    }
+    return true;
+}
+
+#ifdef OLED_ENABLE
+oled_rotation_t oled_init_user(oled_rotation_t rotation) { return OLED_ROTATION_180; }
 
 static void render_kyria_logo(void) {
     static const char PROGMEM gp_logo[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -351,18 +393,13 @@ static void render_status(void) {
     }
 }
 
-void oled_task_user(void) {
+bool oled_task_user(void) {
     if (is_keyboard_master()) {
-#    ifdef LEADER_ENABLE
-        if (leader_started && timer_elapsed(leader_timer) < 3000) {
-            render_leader_macros();
-            return;
-        }
-#    endif
         render_status();  // Renders the current keyboard state (layer, lock, caps, scroll, etc)
     } else {
         render_kyria_logo();
     }
+    return false;
 }
 #endif
 

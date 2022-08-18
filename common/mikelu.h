@@ -1,8 +1,6 @@
 #ifndef USERSPACE
 #define USERSPACE
 
-#include "leader_macros.h"
-
 typedef union {
     uint32_t raw;
     struct {
@@ -10,7 +8,8 @@ typedef union {
     };
 } user_config_t;
 
-enum combos { OEU_ARROWS };
+enum combos { OEU_ARROWS, COMDOT_DQT, COMDOT_GRV, ACOM_BSPC, RL_SLSH, RS_MINS,
+NZ_EQL, RP_CEQL };
 
 enum custom_keycodes {
     DVORAK = SAFE_RANGE,
@@ -33,7 +32,10 @@ enum custom_keycodes {
     MT_DLR,
     MT_AMP,
     MT_STAR,
-    MT_LPAREN
+    MT_LPAREN,
+    CMBSRT,
+    PLOVER,
+    EXT_PLV
 };
 
 enum layers {
@@ -43,6 +45,7 @@ enum layers {
     _RAISE,
     _ADJUST,
     _ARROWS,
+    _PLOVER,
 };
 
 // app specific macros
@@ -77,6 +80,7 @@ enum layers {
 #define MO_LOW MO(_LOWER)
 #define TABU LCTL(S(KC_TAB))
 #define TABD LCTL(KC_TAB)
+#define RSE_TAB  LT(_RAISE, KC_TAB)
 
 // home row mods
 #define ALT_HL ALT_T(KC_O)
@@ -93,3 +97,6 @@ enum layers {
 #define CTL_HR2 RCTL_T(MT_AMP)
 
 #endif
+
+bool num_mod(keyrecord_t *record, uint16_t key);
+bool mod_tap_override(uint16_t mod, uint16_t key1, uint16_t key2);
