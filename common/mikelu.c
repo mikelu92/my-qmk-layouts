@@ -27,7 +27,7 @@ const key_override_t **key_overrides = (const key_override_t *[]){
 #endif
 
 const uint16_t PROGMEM arrows_combo[] = {KC_Q, KC_J, KC_K, COMBO_END};
-const uint16_t PROGMEM bspc_combo[] = {KC_A, KC_COMM, COMBO_END};
+const uint16_t PROGMEM bspc_combo[] = {KC_COMM, KC_DOT, COMBO_END};
 const uint16_t PROGMEM slsh_combo[] = {KC_R, KC_L, COMBO_END};
 const uint16_t PROGMEM mins_combo[] = {KC_R, KC_S, COMBO_END};
 const uint16_t PROGMEM eql_combo[] = {ALT_HR, KC_Z, COMBO_END};
@@ -68,6 +68,9 @@ const custom_shift_key_t custom_shift_keys[] = {
   {GUI_HR2, KC_8},
   {ALT_HR2, KC_9},
   {KC_RPRN, KC_0},
+  {KC_MINS, KC_MINS},
+  {KC_LBRC, KC_LBRC},
+  {KC_RBRC, KC_RBRC},
 };
 
 uint8_t NUM_CUSTOM_SHIFT_KEYS =
@@ -318,6 +321,21 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       return false;
       break;
 #endif
+    case GAME:
+      if (record->event.pressed) {
+        layer_off(_RAISE);
+        layer_off(_LOWER);
+        layer_off(_ADJUST);
+        layer_on(_GAME);
+      }
+      return false;
+      break;
+    case EXT_GME:
+      if (record->event.pressed) {
+        layer_off(_GAME);
+      }
+      return false;
+      break;
     }
     return true;
 }

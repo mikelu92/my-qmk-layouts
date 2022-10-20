@@ -35,7 +35,9 @@ enum custom_keycodes {
     MT_LPAREN,
     CMBSRT,
     PLOVER,
-    EXT_PLV
+    EXT_PLV,
+    GAME,
+    EXT_GME,
 };
 
 enum layers {
@@ -46,6 +48,7 @@ enum layers {
     _ADJUST,
     _ARROWS,
     _PLOVER,
+    _GAME,
 };
 
 // app specific macros
@@ -63,6 +66,9 @@ enum layers {
 #define USCRN LCTL(LSFT(KC_UP)) // BetterTouchTools move cursor up monitor
 #define DSCRN LCTL(LSFT(KC_DOWN)) // BetterTouchTools move cursor down monitor
 #define RSCRN LCTL(LSFT(KC_RIGHT)) // BetterTouchTools move cursor right monitor
+
+#define SPCN HYPR(KC_N)
+#define SPCP HYPR(KC_P)
 
 // hybrid keys & shorthand
 #define SFT_ENT SFT_T(KC_ENT)  // Enter when tapped, shift when held
